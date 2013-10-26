@@ -689,7 +689,7 @@ var gameOver = function() {
       if (enemies.length < 16) {
         for (var i = 0; i < numToSpawn; i++) {
           if (i % 3 === 0) {
-            LargeTriangleSetup();
+            largeTriangleSetup();
           }
           else {
             randomEnemy();

@@ -1,9 +1,6 @@
-var storage = require('node-persist');
-storage.init();
+var db = require('./db'),
+  Score = db.Score;
 
-if (!storage.getItem('scores') || typeof storage.getItem('scores') === undefined) {
-  storage.setItem('scores', []);
-}
 
 var rooms = {}; 
 
@@ -150,37 +147,32 @@ var connect = function(socket) {
 // the following are for a game that's completed
 /*******************************************************************************************************/
 
-  function addToHighScores(name, score) {
-    var scores = storage.getItem('scores');
-    console.log(scores);
-    scores.push({'name': name, 'score': parseInt(score)});
-    scores.sort(function(a,b){
-      return b.score - a.score;
-    });
-    var scores2 = scores.slice(0, 10);
-    storage.setItem('scores', scores2);
-  }
-
   socket.on('game over', function(data) {
+      console.log('game over');
     var room = rooms[data.roomID];
     if (room.playerName === null) {
       room.contSocket.emit('enter name', {'score': data.score});
+      console.log('asked for name');
     }
     else {
-      addToHighScores(room.playerName, data.score);
-      var scores = storage.getItem('scores');
-      socket.emit('display high scores', {'scores': scores});
-      room.contSocket.emit('name already entered');
+      Score.addScore(data.playerName, data.score, function() {
+        Score.findTopTen(function(scores) {
+          socket.emit('display high scores', {'scores': scores});
+          room.contSocket.emit('name already entered');
+        })
+      });
     }
   });
 
   socket.on('name entered from cont', function(data) {
     if (!(data.name === '' || data.name === null)) {
-      addToHighScores(data.name, data.score);
+      Score.addScore(data.playerName, data.score, function() {
+        Score.findTopTen(function(scores) {
+          rooms[data.roomID].roomSocket.emit('display high scores', {'scores': scores});
+        })
+      });
       rooms[data.roomID].playerName = data.name;
     }
-    var scores = storage.getItem('scores');
-    rooms[data.roomID].roomSocket.emit('display high scores', {'scores': scores});
   });
 
   socket.on('play again from mobile', function(data) {
@@ -188,12 +180,24 @@ var connect = function(socket) {
   });
 
   socket.on('name entered from desk', function(data) {
-    if (!(data.name === '' || data.name === null)) {
-      addToHighScores(data.name, data.score);
-      rooms[data.roomID].playerName = data.name;
+      console.log('received name from desk');
+      console.log(data.playerName);
+    if (!(data.playerName === '' || data.playerName === null)) {
+      Score.addScore(data.playerName, data.score, function() {
+          console.log('getting into first callback');
+        Score.findTopTen(function(err, results) {
+            console.log(results);
+
+          socket.emit('display desk play again', {'scores':results});
+        })
+      });
+      rooms[data.roomID].playerName = data.playerName;
     }
-    var scores = storage.getItem('scores');
-    socket.emit('display desk play again', {'scores':scores});
+    else {
+      Score.findTopTen(function(err, results) {
+        socket.emit('display desk play again', {'scores':results});
+      })
+    }
   });
 /*******************************************************************************************************/
 

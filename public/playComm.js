@@ -89,6 +89,7 @@ playComm.submitScore = function(score) {
   if (playComm.name === null || playComm.name === '') {
     playComm.name = prompt('enter name to submit score');
   }
-  socket.emit('name entered from desk', {roomID: playComm.roomID, 'name':playComm.name, 'score': score});
+  console.log(playComm.name);
+  socket.emit('name entered from desk', {roomID: playComm.roomID, 'playerName':playComm.name, 'score': score});
 }
 
