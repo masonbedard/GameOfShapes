@@ -2,15 +2,16 @@
 <html>
 
   <head>
-    <link type='text/css' rel='stylesheet' href='style.css'/>
+
+    <link type='text/css' rel='stylesheet' href='/css/style.css'/>
     
     <!-- Fullscreen -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    
-    <title>FORFUN</title>
+    <title>A Game of Shapes</title>
+
   </head>
 
   <body>
@@ -25,7 +26,6 @@
     <div class='option button' id='help'>help</div>
     <div class ='a'></div>
     
-
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="assets/processing.js"></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -42,14 +42,13 @@
     <script src='cont.js'></script>
     <script src='playComm.js'></script>
     <script src='contComm.js'></script>
+    <script src="/js/build/app.js"></script>
     <script>
 
       var makeid = function() {
         var text = '';
-        //var letters = 'abcdefghijklmnopqrstuvwxyz'
         for (var i = 0; i < 4; i++) {
           text += Math.floor((Math.random() * 9)).toString();
-          //text += letters[Math.floor((Math.random() * 26))];
         }
         return text;
       }

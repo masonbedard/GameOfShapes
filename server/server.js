@@ -1,8 +1,20 @@
+/*
 var express = require('express')
   , http = require('http')
   , connect = require('connect')
   , sockets = require('./sockets');
+*/
 
+var express = require('express');
+var app = express();
+app.use(express.static(__dirname + '/../static'));
+
+var server = app.listen(3000);
+var io = require("socket.io").listen(server);
+
+require("./sockets").init(io);
+
+/*
 var staticServer = connect()
   .use(connect.static('public'))
   .use(connect.directory('public'))
@@ -23,3 +35,4 @@ var cio = require('socket.io').listen(server);
 server.listen(8000);
 
 sockets.init(cio);
+*/

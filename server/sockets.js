@@ -1,7 +1,3 @@
-var db = require('./db'),
-  Score = db.Score;
-
-
 var rooms = {}; 
 
 //var socketsToIds = {};
@@ -11,12 +7,14 @@ var room = function(roomID, roomSocket) {
   this.roomSocket = roomSocket;
   this.contSocket = null;
   this.playerName = null;
-}
-
-
+};
 
 // the following is what the socket for each connected client waits for
 var connect = function(socket) {
+
+
+    console.log("connection");
+
 /*
   socket.on('disconnect', function() {
     console.log('hello');
@@ -208,8 +206,9 @@ var connect = function(socket) {
 
 
 // the following is the initialization of the sockets 
-exports.init = function(cio) {
-  var io = cio;
-  io.sockets.on('connection', connect);
+module.exports = {
+  init: function(io) {
+    io.sockets.on('connection', connect);
+  }
 };
 
