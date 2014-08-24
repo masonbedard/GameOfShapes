@@ -17,4 +17,8 @@ Comm.prototype.emitConnectController = function(roomId, callback) {
     });
 };
 
+Comm.prototype.emitControllerStart = function(roomId) {
+    this.socket.emit("start from mobile", {roomID: roomId});
+};
+
 module.exports = Comm;

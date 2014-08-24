@@ -1,48 +1,64 @@
+var $ = require("jquery-browserify");
 var IdGenerator = require("./utilities/idGenerator");
 var Comm = require("./utilities/comm");
-var playTemplate = require("../hbs/play.hbs");
-var connectTemplate = require("../hbs/connect.hbs");
-var controlledTemplate = require("../hbs/controlled.hbs");
+var View = require("./utilities/view");
 
 var main = function() {
 
+    var socket = io.connect(window.location.href);
+    var roomId;
     var controlled = false;
-    var protocol = {
+    var processingInstance = null;
+
+    var commProtocol = {
         tellControlled: function() {
-            console.log("happening");
             controlled = true;
-            document.body.innerHTML = controlledTemplate();
+            view.setControlled(roomId);
         }
     };
-    var socket = io.connect(window.location.href);
-    var comm = new Comm(socket, protocol);
-    var roomId;
+    var comm = new Comm(socket, commProtocol);
 
-    document.getElementById("play").onclick = function() {
+    var viewProtocol = {
+        tellProcessingInstance: function(instance) {
+            console.log("setting it");
+            processingInstance = instance;
+        }
+    };
+    var view = new View(viewProtocol);
+
+    $(document).on("click", "#play", function() {
         roomId = IdGenerator.getId();
         comm.emitNewRoom(roomId);
-        document.body.innerHTML = playTemplate({"roomId": roomId});
-    };
+        view.setPlay(roomId);
+    });
 
-    document.getElementById("control").onclick = function() {
+    $(document).on("click", "#control", function() {
         roomId = prompt('enter room id');
         comm.emitConnectController(roomId, function(data) {
             if (data.success) {
-                document.body.innerHTML = connectTemplate({"roomId": roomId});
+                view.setControl(roomId);
             } else {
                 alert("invalid room id");
             }
         });
-    };
+    });
 
-    document.getElementById("help").onclick = function() {
-        console.log("help clicked");
-    };
+    $(document).on("click", "#start", function() {
+        view.setStart();
+    });
 
-    setTimeout(function() {
-        console.log("happening");
-        console.log(controlled);
-    }, 10000);
+    $(document).on("click", "#controller-start", function() {
+        view.setControllerStart();
+        comm.emitControllerStart(roomId);
+    });
+
+    $(document).on("click", "#help", function() {
+        view.setHelp();
+    });
+
+    $(document).on("click", "#back", function() {
+        view.setIndex();
+    });
 
 };
 

@@ -8,10 +8,11 @@ playComm.startCanvas = function() {
   canvas.focus();
   playComm.processingInstance = new Processing(canvas, view);
 };
-
+/*
 JQdoc.on('click', '#start', function() {
   playComm.startCanvas();
 });
+*/
 
 JQdoc.on('click', '#uncontplayagain', function() {
   playComm.startCanvas();

@@ -3503,3 +3503,5 @@ var gameOver = function() {
     };
 
   };
+
+module.exports = view;
