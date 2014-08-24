@@ -40,15 +40,16 @@ var connect = function(socket) {
 
   // the following will occur if the client tries to join a room
   socket.on('connect mobile', function(data, callback) {
+    console.log("CONNECTING mobile");
     var desktopRoom = rooms[data.roomID];
     if (typeof desktopRoom !== 'undefined' && desktopRoom.contSocket === null) {
       rooms[data.roomID].roomSocket.emit('controlled', {roomID: data.roomID});
       rooms[data.roomID].contSocket = socket;
       //socketsToIds[socket] = data.roomID;
-      callback({'registered':true});
+      callback({'success':true});
     }
     else {
-      callback({'registered':false});
+      callback({'success':false});
     }
   });
 

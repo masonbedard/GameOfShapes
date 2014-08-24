@@ -9,7 +9,7 @@ playComm.startCanvas = function() {
   playComm.processingInstance = new Processing(canvas, view);
 };
 
-JQdoc.on('click', '#desktopstart', function() {
+JQdoc.on('click', '#start', function() {
   playComm.startCanvas();
 });
 

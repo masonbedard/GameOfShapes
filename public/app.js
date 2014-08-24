@@ -2,43 +2,53 @@
 var IdGenerator = require("./utilities/idGenerator");
 var Comm = require("./utilities/comm");
 var playTemplate = require("../hbs/play.hbs");
+var connectTemplate = require("../hbs/connect.hbs");
+var controlledTemplate = require("../hbs/controlled.hbs");
 
 var main = function() {
 
-    var roomId = IdGenerator.getId();
+    var controlled = false;
+    var protocol = {
+        tellControlled: function() {
+            console.log("happening");
+            controlled = true;
+            document.body.innerHTML = controlledTemplate();
+        }
+    };
+    var socket = io.connect(window.location.href);
+    var comm = new Comm(socket, protocol);
+    var roomId;
 
     document.getElementById("play").onclick = function() {
-        console.log("clicked");
-        document.body.innerHTML = playTemplate();
+        roomId = IdGenerator.getId();
+        comm.emitNewRoom(roomId);
+        document.body.innerHTML = playTemplate({"roomId": roomId});
     };
 
     document.getElementById("control").onclick = function() {
-        console.log("control clicked");
-        if (data.registered) {
-                JQbody.html("<div class='a'></div>" +
-                  "<div class='option'>TITLE</div>" +
-                  "<div class='b'></div>" +
-                  "<div class='option'>id " + contComm.roomID + "</div>" +
-                  "<div class='b'></div>" +
-                  "<div class='option'>connected</div>" +
-                  "<div class='b'></div>" +
-                  "<div class='option button' id='mobilestart'>start</div>" +
-                  "<div class ='a'></div>"
-                );
-              }
-              else {
-                alert('invalid room id');
-              }
+        roomId = prompt('enter room id');
+        comm.emitConnectController(roomId, function(data) {
+            if (data.success) {
+                document.body.innerHTML = connectTemplate({"roomId": roomId});
+            } else {
+                alert("invalid room id");
+            }
+        });
     };
 
     document.getElementById("help").onclick = function() {
         console.log("help clicked");
     };
 
+    setTimeout(function() {
+        console.log("happening");
+        console.log(controlled);
+    }, 10000);
+
 };
 
 main();
-},{"../hbs/play.hbs":10,"./utilities/comm":11,"./utilities/idGenerator":12}],2:[function(require,module,exports){
+},{"../hbs/connect.hbs":10,"../hbs/controlled.hbs":11,"../hbs/play.hbs":12,"./utilities/comm":13,"./utilities/idGenerator":14}],2:[function(require,module,exports){
 "use strict";
 /*globals Handlebars: true */
 var base = require("./handlebars/base");
@@ -616,24 +626,51 @@ module.exports = require("handlebars/runtime")["default"];
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template({"compiler":[5,">= 2.0.0"],"main":function(depth0,helpers,partials,data) {
-  return "<div>\n    <div class=\"menu-item title\">a game of shapes</div>\n    <div class=\"menu-item btn\" id=\"play\">template</div>\n    <div class=\"menu-item btn\" id=\"control\">template</div>\n    <div class=\"menu-item btn\" id=\"help\">template</div>\n</div>";
-  },"useData":true});
+  var helper, functionType="function", escapeExpression=this.escapeExpression;
+  return "<div class=\"menu-item\" id=\"title\">a game of shapes</div>\n<div class=\"menu-item btn\" id=\"controller-start\">start</div>\n<div class=\"menu-item\">connected with id "
+    + escapeExpression(((helper = helpers.roomId || (depth0 && depth0.roomId)),(typeof helper === functionType ? helper.call(depth0, {"name":"roomId","hash":{},"data":data}) : helper)))
+    + "</div>";
+},"useData":true});
 
 },{"hbsfy/runtime":9}],11:[function(require,module,exports){
-var Comm = function(socket) {
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template({"compiler":[5,">= 2.0.0"],"main":function(depth0,helpers,partials,data) {
+  return "<div id=\"hello\">HELLO</div>";
+  },"useData":true});
+
+},{"hbsfy/runtime":9}],12:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template({"compiler":[5,">= 2.0.0"],"main":function(depth0,helpers,partials,data) {
+  var helper, functionType="function", escapeExpression=this.escapeExpression;
+  return "<div class=\"menu-item\" id=\"title\">A Game of Shapes</div>\n<div class=\"menu-item btn\" id=\"start\">start</div>\n<div class=\"menu-item\">or use id "
+    + escapeExpression(((helper = helpers.roomId || (depth0 && depth0.roomId)),(typeof helper === functionType ? helper.call(depth0, {"name":"roomId","hash":{},"data":data}) : helper)))
+    + " to connect</div>";
+},"useData":true});
+
+},{"hbsfy/runtime":9}],13:[function(require,module,exports){
+var Comm = function(socket, protocol) {
     this.socket = socket;
+
+    this.socket.on("controlled", function() {
+        protocol.tellControlled();
+    });
+
 };
 
 Comm.prototype.emitNewRoom = function(roomId) {
-    this.socket.emit("new room", {"roomID": playComm.roomId});
+    this.socket.emit("new room", {"roomID": roomId});
 };
 
 Comm.prototype.emitConnectController = function(roomId, callback) {
-    this.socket.emit("connect mobile", {"roomID": roomId}, callback(data));
+    this.socket.emit("connect mobile", {"roomID": roomId}, function(data) {
+        callback && callback(data);
+    });
 };
 
 module.exports = Comm;
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 module.exports = {
     getId: function() {
         var text = "";
