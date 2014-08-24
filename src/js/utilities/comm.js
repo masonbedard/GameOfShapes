@@ -1,10 +1,8 @@
-var Comm = function(socket, protocol) {
-    this.socket = socket;
-
+var Comm = function(protocol) {
+    this.socket = io.connect(window.location.href);
     this.socket.on("controlled", function() {
         protocol.tellControlled();
     });
-
 };
 
 Comm.prototype.emitNewRoom = function(roomId) {

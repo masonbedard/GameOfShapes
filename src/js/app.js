@@ -5,7 +5,6 @@ var View = require("./utilities/view");
 
 var main = function() {
 
-    var socket = io.connect(window.location.href);
     var roomId;
     var controlled = false;
     var processingInstance = null;
@@ -16,7 +15,7 @@ var main = function() {
             view.setControlled(roomId);
         }
     };
-    var comm = new Comm(socket, commProtocol);
+    var comm = new Comm(commProtocol);
 
     var viewProtocol = {
         tellProcessingInstance: function(instance) {

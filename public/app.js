@@ -6,7 +6,6 @@ var View = require("./utilities/view");
 
 var main = function() {
 
-    var socket = io.connect(window.location.href);
     var roomId;
     var controlled = false;
     var processingInstance = null;
@@ -17,7 +16,7 @@ var main = function() {
             view.setControlled(roomId);
         }
     };
-    var comm = new Comm(socket, commProtocol);
+    var comm = new Comm(commProtocol);
 
     var viewProtocol = {
         tellProcessingInstance: function(instance) {
@@ -13708,13 +13707,11 @@ var gameOver = function() {
 module.exports = view;
 
 },{}],20:[function(require,module,exports){
-var Comm = function(socket, protocol) {
-    this.socket = socket;
-
+var Comm = function(protocol) {
+    this.socket = io.connect(window.location.href);
     this.socket.on("controlled", function() {
         protocol.tellControlled();
     });
-
 };
 
 Comm.prototype.emitNewRoom = function(roomId) {
