@@ -1,33 +1,30 @@
 <!DOCTYPE html>
 <html>
 
-  <head>
+    <head>
 
-    <link type='text/css' rel='stylesheet' href='/css/style.css'/>
-    
-    <!-- Fullscreen -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <title>A Game of Shapes</title>
 
-    <title>A Game of Shapes</title>
+        <link type='text/css' rel='stylesheet' href='/style.css'/>
+        
+        <!-- Fullscreen -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-  </head>
+    </head>
 
-  <body>
+    <body>
 
-    <div class='a'></div>
-    <div class='option'>TITLE</div> 
-    <div class='b'></div>
-    <div class='option button' id='play'>play</div>
-    <div class='b'></div>
-    <div class='option button' id='control'>control</div>
-    <div class='b'></div>
-    <div class='option button' id='help'>help</div>
-    <div class ='a'></div>
+        <div>
+            <div class="menu-item title">a game of shapes</div>
+            <div class="menu-item btn" id="play">play</div>
+            <div class="menu-item btn" id="control">control</div>
+            <div class="menu-item btn" id="help">help</div>
+        </div>
     
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script src="assets/processing.js"></script>
+    <script src="processing.js"></script>
     <script src="/socket.io/socket.io.js"></script>
  
     <script>
@@ -37,12 +34,11 @@
       var JQwindow = $(window);
       var touchable = 'createTouch' in document;
     </script>
-    <script src='dynamicFont.js'></script>
     <script src='view.js'></script>
     <script src='cont.js'></script>
     <script src='playComm.js'></script>
     <script src='contComm.js'></script>
-    <script src="/js/build/app.js"></script>
+    <script src="/app.js"></script>
     <script>
 
       var makeid = function() {
@@ -53,16 +49,13 @@
         return text;
       }
 
-      JQwindow.resize(function() {
-        dynamicFont.getCSS();
-      });
-        
       $(function() {
         JQdoc.on('click', '#play', function() {
           playComm.roomID = makeid();
           socket.emit('new room', {'roomID': playComm.roomID});
+          
           JQbody.html("<div class='a'></div>" +
-            "<div class='option'>TITLE</div>" + 
+            "<div class='option'>TITLE</div>" +
             "<div class='b'></div>" +
             "<div class='option button' id='desktopstart'>start</div>" +
             "<div class='b'></div>" +
@@ -71,7 +64,7 @@
             "<div class='option'>to connect</div>" +
             "<div class ='a'></div>"
            );
-           dynamicFont.setOption();
+
         });
 
         JQdoc.on('click', '#control', function() {
@@ -89,7 +82,6 @@
                   "<div class='option button' id='mobilestart'>start</div>" +
                   "<div class ='a'></div>"
                 );
-                dynamicFont.setOption();
               }
               else {
                 alert('invalid room id');
@@ -112,8 +104,6 @@
             "<div class='option button' id='back'>back</div>" +
             "<div class='a'></div>"
           );
-          dynamicFont.setOption();
-          dynamicFont.setLongtext();
         });
 
         JQdoc.on('click', '#back', function() {
@@ -127,7 +117,6 @@
             "<div class='option button' id='help'>help</div>" +
             "<div class ='a'></div>"
           );
-          dynamicFont.setOption();
         });
 
       });

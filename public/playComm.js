@@ -28,7 +28,6 @@ socket.on('controlled', function() {
     "<div class='option'>to start</div>" +
     "<div class ='a'></div>"
   );
-  dynamicFont.setOption();
   playComm.controlled = true;
 });
 
@@ -61,8 +60,6 @@ playComm.playAgainCont = function(scores) {
   page += "</div><div class='b'></div><div class='option button'>more projects</div><div class='a'></div>";
   
   JQbody.html(page);
-  dynamicFont.setLongtext();
-  dynamicFont.setOption();
 };
 
 playComm.playAgainUncont = function(scores) {
@@ -77,8 +74,6 @@ playComm.playAgainUncont = function(scores) {
   page += "</div><div class='b'></div><div class='option button'>more projects</div><div class='a'></div>";
   
   JQbody.html(page);
-  dynamicFont.setLongtext();
-  dynamicFont.setOption();
 };
 
 playComm.tellContGameOver = function(score) {

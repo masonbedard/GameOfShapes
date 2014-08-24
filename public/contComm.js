@@ -19,7 +19,6 @@ socket.on('room disconnected', function() {
     "<div class='option button' id='help'>help</div>" +
     "<div class ='a'></div>"
   );
-  dynamicFont.setOption();
 });
 
 socket.on('name already entered', function() {
@@ -48,7 +47,6 @@ contComm.playAgainCont = function() {
       "<div class='option button'>more projects</div>" +
       "<div class ='a'></div>"
   );
-  dynamicFont.setOption();
 };
 
 contComm.startCanvas = function() {

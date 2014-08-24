@@ -1,4 +1,4 @@
-function control(pjs) {
+var control = function(pjs) {
 
   var halfScreenWidth;
 
@@ -131,15 +131,12 @@ function control(pjs) {
         leftStick.current.set(currX, currY, 0);
 
         var distPercent = activeDist / maxStickTravel;
-        //var speedPercent = distPercent * playerSpeed;
 
         currVector.normalize();
-        //currVector.mult(speedPercent);
 
         socket.emit('left stick move', {roomID: contComm.roomID, 'currVector': currVector, 'distPercent': distPercent});
 
-      }
-      else if (rightStick.id === tempTouch.identifier) {
+      } else if (rightStick.id === tempTouch.identifier) {
         var currVector = pjs.PVector.sub(tempVector, rightStick.origin);
         var currDist = currVector.mag();
         var activeDist = (currDist < maxStickTravel ? currDist : maxStickTravel);
@@ -165,4 +162,6 @@ function control(pjs) {
     }
   };
 
-}
+};
+
+module.exports = control;
