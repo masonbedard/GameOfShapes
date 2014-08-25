@@ -5,25 +5,54 @@ var View = require("./utilities/view");
 
 var main = function() {
 
-    var roomId;
+    var roomId = null;
     var controlled = false;
     var processingInstance = null;
+    var name = null;
 
     var commProtocol = {
-        tellControlled: function() {
+        sendControlled: function() {
+            console.log("controlled in protocol");
             controlled = true;
             view.setControlled(roomId);
+        },
+        sendControllerStart: function() {
+            console.log("starting controller by protocol");
+            view.setStart();
+        },
+        sendPlayAgain: function(leaderBoard) {
+            if (controlled) {
+            } else {
+                view.setPlayAgain(leaderBoard);
+            }
+        },
+        sendEnterName: function(name) {
+            comm.emitSubmitScore(roomId, name);
         }
     };
     var comm = new Comm(commProtocol);
 
     var viewProtocol = {
-        tellProcessingInstance: function(instance) {
-            console.log("setting it");
+        sendProcessingInstance: function(instance) {
             processingInstance = instance;
+            processingInstance.protocol = gameProtocol;
         }
     };
     var view = new View(viewProtocol);
+
+    var gameProtocol = {
+        sendGameOver: function(score) {
+            processingInstance.exit();
+            if (controlled) {
+                comm.emitGameOver(roomId, score);
+            } else {
+                if (name === null || name === "") {
+                    name = prompt("enter name to submit score");
+                }
+                comm.emitSubmitScore(roomId, name, score);
+            }
+        }
+    };
 
     $(document).on("click", "#play", function() {
         roomId = IdGenerator.getId();
@@ -33,7 +62,7 @@ var main = function() {
 
     $(document).on("click", "#control", function() {
         roomId = prompt('enter room id');
-        comm.emitConnectController(roomId, function(data) {
+        comm.emitControllerConnect(roomId, function(data) {
             if (data.success) {
                 view.setControl(roomId);
             } else {
@@ -57,6 +86,10 @@ var main = function() {
 
     $(document).on("click", "#back", function() {
         view.setIndex();
+    });
+
+    $(document).on("click", "#play-again", function() {
+        view.setStart();
     });
 
 };

@@ -1,11 +1,9 @@
 // red 221, 105, 97       dd6961
 // green     161, 200, 154     a1c89a
 
+var initGame = function(pjs) {
 
-//note think about square snake and how it targets
-
-
-var view = function(pjs) {
+    pjs.testing = "mason";
 
 
 // the following are variables used throughout the game
@@ -195,9 +193,11 @@ var view = function(pjs) {
     maxScreenDir = Math.ceil(Math.max(pjs.screenWidth, pjs.screenHeight));
     maxScreenDir = Math.max(maxScreenDir, 900);
     fSize = maxScreenDir / 32;
+    /*
     if (touchable) {
       fSize = Math.max(fSize, 48);
     }
+    */
 
     increment = (2 * maxScreenDir) / 6;
 
@@ -250,7 +250,7 @@ var view = function(pjs) {
 
 // the following are the listeners for controller input 
 /*******************************************************************************************************/
-
+/*
   socket.on('left stick move', function(data) {
     var speedPercent = data.distPercent * player.moveSpeed;
     player.vel.set(data.currVector);
@@ -274,39 +274,16 @@ var view = function(pjs) {
   socket.on('right stick stop', function() {
     rightStickActive = false;
   });
+*/
 
 /*******************************************************************************************************/
 
 
-var gameOver = function() {
-  pjs.noLoop();
-  if (playComm.controlled) {
-    playComm.tellContGameOver(player.score);
-  }
-  else {
-    playComm.submitScore(player.score);
-  }
-};
-
-
-
-// the following is the border class that is only used up above in set up really
-/*******************************************************************************************************
-
-  var Borders = function() {
-    this.borderWidth = 60;
-    this.topCorner = new pjs.PVector(-quarterMaxScreenDir, -quarterMaxScreenDir - this.borderWidth);
-    this.leftCorner = new pjs.PVector(-quarterMaxScreenDir - this.borderWidth + 1, -quarterMaxScreenDir - this.borderWidth);
-    this.rightCorner = new pjs.PVector(maxScreenDir + quarterMaxScreenDir - 1, -quarterMaxScreenDir - this.borderWidth);
-    this.bottomCorner = new pjs.PVector(-quarterMaxScreenDir, maxScreenDir + quarterMaxScreenDir);
-
-    this.illustrate = function() {
-      pjs.rect(this.topCorner.x, this.topCorner.y, 1.5 * maxScreenDir, this.borderWidth);
-      pjs.rect(this.bottomCorner.x, this.bottomCorner.y, 1.5 * maxScreenDir, this.borderWidth);
-      pjs.rect(this.leftCorner.x, this.leftCorner.y, this.borderWidth, 1.5 * maxScreenDir + 2 * this.borderWidth);
-      pjs.rect(this.rightCorner.x, this.rightCorner.y, this.borderWidth, 1.5 * maxScreenDir + 2 * this.borderWidth);
+    var gameOver = function() {
+        console.log("in game over");
+        pjs.noLoop();
+        pjs.protocol.sendGameOver(player.score);
     };
-  };
 
 
 /*******************************************************************************************************/
@@ -548,10 +525,12 @@ var gameOver = function() {
         }
       }
 
+/*
       if (touchable && !playComm.controlled) {
         console.log('here');
         illustrateAnalogs();
       }
+      */
       // borders.illustrate();
       pjs.popMatrix();
     };
@@ -880,7 +859,7 @@ var gameOver = function() {
       this.currGun;
       this.currAmmo = 999;
 
-      this.lives = 3;
+      this.lives = 1;
       this.score = 0;
 
       this.spawning = true;
@@ -3504,4 +3483,4 @@ var gameOver = function() {
 
   };
 
-module.exports = view;
+module.exports = initGame;

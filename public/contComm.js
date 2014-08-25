@@ -24,7 +24,7 @@ socket.on('room disconnected', function() {
 socket.on('name already entered', function() {
   contComm.playAgainCont();
 });
-
+/*
 JQdoc.on('click', '#mobilestart', function() {
   socket.emit('start from mobile', {roomID: contComm.roomID});
   contComm.startCanvas();
@@ -34,6 +34,7 @@ JQdoc.on('click', '#playagaincont', function() {
   socket.emit('play again from mobile', {roomID: contComm.roomID});
   contComm.startCanvas();
 });
+*/
 
 contComm.playAgainCont = function() {
   contComm.processingInstance.exit();

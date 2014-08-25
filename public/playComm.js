@@ -18,6 +18,8 @@ JQdoc.on('click', '#uncontplayagain', function() {
   playComm.startCanvas();
 });
 
+/*
+
 socket.on('controlled', function() {
   JQbody.html("<div class='a'></div>" +
     "<div class='option'>TITLE</div>" + 
@@ -31,7 +33,6 @@ socket.on('controlled', function() {
   );
   playComm.controlled = true;
 });
-
 socket.on('mobile says play again', function() {
   playComm.startCanvas();
 });
@@ -47,6 +48,7 @@ socket.on('display high scores', function(data) {
 socket.on('display desk play again', function(data) {
   playComm.playAgainUncont(data.scores);
 });
+*/
 
 
 playComm.playAgainCont = function(scores) {

@@ -1,4 +1,4 @@
-var control = function(pjs) {
+var initController = function(pjs) {
 
   var halfScreenWidth;
 
@@ -89,6 +89,7 @@ var control = function(pjs) {
 
     for (var i = 0; i < e.changedTouches.length; i++) {
 
+/*
       if (leftStick.id === e.changedTouches[i].identifier) {
         leftStick.active = false;
         socket.emit('left stick stop', {roomID: contComm.roomID});
@@ -97,6 +98,7 @@ var control = function(pjs) {
         rightStick.active = false;
         socket.emit('right stick stop', {roomID: contComm.roomID});
       }
+      */
 
     }
   };
@@ -134,7 +136,7 @@ var control = function(pjs) {
 
         currVector.normalize();
 
-        socket.emit('left stick move', {roomID: contComm.roomID, 'currVector': currVector, 'distPercent': distPercent});
+       // socket.emit('left stick move', {roomID: contComm.roomID, 'currVector': currVector, 'distPercent': distPercent});
 
       } else if (rightStick.id === tempTouch.identifier) {
         var currVector = pjs.PVector.sub(tempVector, rightStick.origin);
@@ -156,7 +158,7 @@ var control = function(pjs) {
         }
         rightStick.current.set(currX, currY, 0);
 
-        socket.emit('right stick move', {roomID: contComm.roomID, vel: currVector});
+        //socket.emit('right stick move', {roomID: contComm.roomID, vel: currVector});
 
       }
     }
@@ -164,4 +166,4 @@ var control = function(pjs) {
 
 };
 
-module.exports = control;
+module.exports = initController;

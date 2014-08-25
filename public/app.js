@@ -6,25 +6,54 @@ var View = require("./utilities/view");
 
 var main = function() {
 
-    var roomId;
+    var roomId = null;
     var controlled = false;
     var processingInstance = null;
+    var name = null;
 
     var commProtocol = {
-        tellControlled: function() {
+        sendControlled: function() {
+            console.log("controlled in protocol");
             controlled = true;
             view.setControlled(roomId);
+        },
+        sendControllerStart: function() {
+            console.log("starting controller by protocol");
+            view.setStart();
+        },
+        sendPlayAgain: function(leaderBoard) {
+            if (controlled) {
+            } else {
+                view.setPlayAgain(leaderBoard);
+            }
+        },
+        sendEnterName: function(name) {
+            comm.emitSubmitScore(roomId, name);
         }
     };
     var comm = new Comm(commProtocol);
 
     var viewProtocol = {
-        tellProcessingInstance: function(instance) {
-            console.log("setting it");
+        sendProcessingInstance: function(instance) {
             processingInstance = instance;
+            processingInstance.protocol = gameProtocol;
         }
     };
     var view = new View(viewProtocol);
+
+    var gameProtocol = {
+        sendGameOver: function(score) {
+            processingInstance.exit();
+            if (controlled) {
+                comm.emitGameOver(roomId, score);
+            } else {
+                if (name === null || name === "") {
+                    name = prompt("enter name to submit score");
+                }
+                comm.emitSubmitScore(roomId, name, score);
+            }
+        }
+    };
 
     $(document).on("click", "#play", function() {
         roomId = IdGenerator.getId();
@@ -34,7 +63,7 @@ var main = function() {
 
     $(document).on("click", "#control", function() {
         roomId = prompt('enter room id');
-        comm.emitConnectController(roomId, function(data) {
+        comm.emitControllerConnect(roomId, function(data) {
             if (data.success) {
                 view.setControl(roomId);
             } else {
@@ -60,10 +89,14 @@ var main = function() {
         view.setIndex();
     });
 
+    $(document).on("click", "#play-again", function() {
+        view.setStart();
+    });
+
 };
 
 main();
-},{"./utilities/comm":20,"./utilities/idGenerator":21,"./utilities/view":22,"jquery-browserify":10}],2:[function(require,module,exports){
+},{"./utilities/comm":21,"./utilities/idGenerator":22,"./utilities/view":23,"jquery-browserify":10}],2:[function(require,module,exports){
 "use strict";
 /*globals Handlebars: true */
 var base = require("./handlebars/base");
@@ -10030,7 +10063,24 @@ module.exports = Handlebars.template({"compiler":[5,">= 2.0.0"],"main":function(
 },"useData":true});
 
 },{"hbsfy/runtime":9}],18:[function(require,module,exports){
-var control = function(pjs) {
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+  var helper, functionType="function", escapeExpression=this.escapeExpression;
+  return "\n    <p>"
+    + escapeExpression(((helper = helpers.name || (depth0 && depth0.name)),(typeof helper === functionType ? helper.call(depth0, {"name":"name","hash":{},"data":data}) : helper)))
+    + " "
+    + escapeExpression(((helper = helpers.score || (depth0 && depth0.score)),(typeof helper === functionType ? helper.call(depth0, {"name":"score","hash":{},"data":data}) : helper)))
+    + "</p>\n    ";
+},"compiler":[5,">= 2.0.0"],"main":function(depth0,helpers,partials,data) {
+  var stack1, buffer = "<div id=\"title\">game of shapes</div>\n<div class=\"btn\" id=\"play-again\">play again</div>\n<div>\n    <p>leader board</p>\n    ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.leaderBoard), {"name":"each","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  return buffer + "\n</div>\n<div><a href=\"://masonbedard.com\">more projects</a></div>\n\n";
+},"useData":true});
+
+},{"hbsfy/runtime":9}],19:[function(require,module,exports){
+var initController = function(pjs) {
 
   var halfScreenWidth;
 
@@ -10121,6 +10171,7 @@ var control = function(pjs) {
 
     for (var i = 0; i < e.changedTouches.length; i++) {
 
+/*
       if (leftStick.id === e.changedTouches[i].identifier) {
         leftStick.active = false;
         socket.emit('left stick stop', {roomID: contComm.roomID});
@@ -10129,6 +10180,7 @@ var control = function(pjs) {
         rightStick.active = false;
         socket.emit('right stick stop', {roomID: contComm.roomID});
       }
+      */
 
     }
   };
@@ -10166,7 +10218,7 @@ var control = function(pjs) {
 
         currVector.normalize();
 
-        socket.emit('left stick move', {roomID: contComm.roomID, 'currVector': currVector, 'distPercent': distPercent});
+       // socket.emit('left stick move', {roomID: contComm.roomID, 'currVector': currVector, 'distPercent': distPercent});
 
       } else if (rightStick.id === tempTouch.identifier) {
         var currVector = pjs.PVector.sub(tempVector, rightStick.origin);
@@ -10188,7 +10240,7 @@ var control = function(pjs) {
         }
         rightStick.current.set(currX, currY, 0);
 
-        socket.emit('right stick move', {roomID: contComm.roomID, vel: currVector});
+        //socket.emit('right stick move', {roomID: contComm.roomID, vel: currVector});
 
       }
     }
@@ -10196,16 +10248,14 @@ var control = function(pjs) {
 
 };
 
-module.exports = control;
-},{}],19:[function(require,module,exports){
+module.exports = initController;
+},{}],20:[function(require,module,exports){
 // red 221, 105, 97       dd6961
 // green     161, 200, 154     a1c89a
 
+var initGame = function(pjs) {
 
-//note think about square snake and how it targets
-
-
-var view = function(pjs) {
+    pjs.testing = "mason";
 
 
 // the following are variables used throughout the game
@@ -10395,9 +10445,11 @@ var view = function(pjs) {
     maxScreenDir = Math.ceil(Math.max(pjs.screenWidth, pjs.screenHeight));
     maxScreenDir = Math.max(maxScreenDir, 900);
     fSize = maxScreenDir / 32;
+    /*
     if (touchable) {
       fSize = Math.max(fSize, 48);
     }
+    */
 
     increment = (2 * maxScreenDir) / 6;
 
@@ -10450,7 +10502,7 @@ var view = function(pjs) {
 
 // the following are the listeners for controller input 
 /*******************************************************************************************************/
-
+/*
   socket.on('left stick move', function(data) {
     var speedPercent = data.distPercent * player.moveSpeed;
     player.vel.set(data.currVector);
@@ -10474,39 +10526,16 @@ var view = function(pjs) {
   socket.on('right stick stop', function() {
     rightStickActive = false;
   });
+*/
 
 /*******************************************************************************************************/
 
 
-var gameOver = function() {
-  pjs.noLoop();
-  if (playComm.controlled) {
-    playComm.tellContGameOver(player.score);
-  }
-  else {
-    playComm.submitScore(player.score);
-  }
-};
-
-
-
-// the following is the border class that is only used up above in set up really
-/*******************************************************************************************************
-
-  var Borders = function() {
-    this.borderWidth = 60;
-    this.topCorner = new pjs.PVector(-quarterMaxScreenDir, -quarterMaxScreenDir - this.borderWidth);
-    this.leftCorner = new pjs.PVector(-quarterMaxScreenDir - this.borderWidth + 1, -quarterMaxScreenDir - this.borderWidth);
-    this.rightCorner = new pjs.PVector(maxScreenDir + quarterMaxScreenDir - 1, -quarterMaxScreenDir - this.borderWidth);
-    this.bottomCorner = new pjs.PVector(-quarterMaxScreenDir, maxScreenDir + quarterMaxScreenDir);
-
-    this.illustrate = function() {
-      pjs.rect(this.topCorner.x, this.topCorner.y, 1.5 * maxScreenDir, this.borderWidth);
-      pjs.rect(this.bottomCorner.x, this.bottomCorner.y, 1.5 * maxScreenDir, this.borderWidth);
-      pjs.rect(this.leftCorner.x, this.leftCorner.y, this.borderWidth, 1.5 * maxScreenDir + 2 * this.borderWidth);
-      pjs.rect(this.rightCorner.x, this.rightCorner.y, this.borderWidth, 1.5 * maxScreenDir + 2 * this.borderWidth);
+    var gameOver = function() {
+        console.log("in game over");
+        pjs.noLoop();
+        pjs.protocol.sendGameOver(player.score);
     };
-  };
 
 
 /*******************************************************************************************************/
@@ -10748,10 +10777,12 @@ var gameOver = function() {
         }
       }
 
+/*
       if (touchable && !playComm.controlled) {
         console.log('here');
         illustrateAnalogs();
       }
+      */
       // borders.illustrate();
       pjs.popMatrix();
     };
@@ -11080,7 +11111,7 @@ var gameOver = function() {
       this.currGun;
       this.currAmmo = 999;
 
-      this.lives = 3;
+      this.lives = 1;
       this.score = 0;
 
       this.spawning = true;
@@ -13704,32 +13735,63 @@ var gameOver = function() {
 
   };
 
-module.exports = view;
+module.exports = initGame;
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 var Comm = function(protocol) {
+
     this.socket = io.connect(window.location.href);
+
     this.socket.on("controlled", function() {
-        protocol.tellControlled();
+        protocol.sendControlled();
     });
+
+    this.socket.on("mobile says start", function() {
+        protocol.sendControllerStart();
+    });
+
+    this.socket.on("set play again", function(data) {
+        protocol.sendPlayAgain(data.leaderBoard);
+    });
+
+    this.socket.on("enter name", function(data) {
+        var name = prompt("enter name to submit score");
+        protocol.sendEnterName(name);
+    });
+
 };
 
 Comm.prototype.emitNewRoom = function(roomId) {
-    this.socket.emit("new room", {"roomID": roomId});
+    this.socket.emit("init room", {"roomId": roomId});
 };
 
-Comm.prototype.emitConnectController = function(roomId, callback) {
-    this.socket.emit("connect mobile", {"roomID": roomId}, function(data) {
+Comm.prototype.emitControllerConnect = function(roomId, callback) {
+    this.socket.emit("controller connect", {"roomId": roomId}, function(data) {
         callback && callback(data);
     });
 };
 
 Comm.prototype.emitControllerStart = function(roomId) {
-    this.socket.emit("start from mobile", {roomID: roomId});
+    console.log("controller start");
+    this.socket.emit("controller start", {"roomID": roomId});
+};
+
+Comm.prototype.emitGameOver = function(roomId, score) {
+    console.log(roomId);
+    console.log(score);
+    this.socket.emit("game over", {"roomID": roomId, "score": score});
+};
+
+Comm.prototype.emitSubmitScore = function(roomId, name, score) {
+    this.socket.emit("submit score", {
+        "roomId": roomId, 
+        "playerName": name,
+        "score": score
+    });
 };
 
 module.exports = Comm;
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 module.exports = {
     getId: function() {
         var text = "";
@@ -13739,7 +13801,7 @@ module.exports = {
         return text;
     }
 };
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var indexTemplate = require("../../hbs/index.hbs");
 var playTemplate = require("../../hbs/play.hbs");
 var controlTemplate = require("../../hbs/control.hbs");
@@ -13747,8 +13809,9 @@ var controlledTemplate = require("../../hbs/controlled.hbs");
 var gameTemplate = require("../../hbs/game.hbs");
 var controllerTemplate = require("../../hbs/controller.hbs");
 var helpTemplate = require("../../hbs/help.hbs");
-var game = require("../game/game");
-var controller = require("../game/controller");
+var playAgainTemplate = require("../../hbs/playAgain.hbs");
+var initGame = require("../game/game");
+var initController = require("../game/controller");
 
 var View = function(protocol) {
     this.protocol = protocol;
@@ -13767,27 +13830,34 @@ View.prototype.setControl = function(roomId) {
 };
 
 View.prototype.setControlled = function(roomId) {
+    console.log("setting controlled in view");
     document.body.innerHTML = controlledTemplate({"roomId": roomId});
 };
 
 View.prototype.startProcessing = function(canvas, processingFunction) {
     canvas.focus();
-    this.protocol.tellProcessingInstance(new Processing(canvas, processingFunction));
+    this.protocol.sendProcessingInstance(new Processing(canvas, processingFunction));
 };
 
 View.prototype.setControllerStart = function() {
     document.body.innerHTML = controllerTemplate();
-    this.startProcessing(document.getElementById("controller"), controller);
+    this.startProcessing(document.getElementById("controller"), initController);
 };
 
 View.prototype.setStart = function() {
     document.body.innerHTML = gameTemplate();
-    this.startProcessing(document.getElementById("game"), game);
+    this.startProcessing(document.getElementById("game"), initGame);
 };
 
 View.prototype.setHelp = function() {
     document.body.innerHTML = helpTemplate();
 };
 
+View.prototype.setPlayAgain = function(leaderBoard) {
+    console.log("HERE");
+    console.log(leaderBoard);
+    document.body.innerHTML = playAgainTemplate({"leaderBoard": leaderBoard});
+}
+
 module.exports = View;
-},{"../../hbs/control.hbs":11,"../../hbs/controlled.hbs":12,"../../hbs/controller.hbs":13,"../../hbs/game.hbs":14,"../../hbs/help.hbs":15,"../../hbs/index.hbs":16,"../../hbs/play.hbs":17,"../game/controller":18,"../game/game":19}]},{},[1]);
+},{"../../hbs/control.hbs":11,"../../hbs/controlled.hbs":12,"../../hbs/controller.hbs":13,"../../hbs/game.hbs":14,"../../hbs/help.hbs":15,"../../hbs/index.hbs":16,"../../hbs/play.hbs":17,"../../hbs/playAgain.hbs":18,"../game/controller":19,"../game/game":20}]},{},[1]);

@@ -5,8 +5,9 @@ var controlledTemplate = require("../../hbs/controlled.hbs");
 var gameTemplate = require("../../hbs/game.hbs");
 var controllerTemplate = require("../../hbs/controller.hbs");
 var helpTemplate = require("../../hbs/help.hbs");
-var game = require("../game/game");
-var controller = require("../game/controller");
+var playAgainTemplate = require("../../hbs/playAgain.hbs");
+var initGame = require("../game/game");
+var initController = require("../game/controller");
 
 var View = function(protocol) {
     this.protocol = protocol;
@@ -25,26 +26,33 @@ View.prototype.setControl = function(roomId) {
 };
 
 View.prototype.setControlled = function(roomId) {
+    console.log("setting controlled in view");
     document.body.innerHTML = controlledTemplate({"roomId": roomId});
 };
 
 View.prototype.startProcessing = function(canvas, processingFunction) {
     canvas.focus();
-    this.protocol.tellProcessingInstance(new Processing(canvas, processingFunction));
+    this.protocol.sendProcessingInstance(new Processing(canvas, processingFunction));
 };
 
 View.prototype.setControllerStart = function() {
     document.body.innerHTML = controllerTemplate();
-    this.startProcessing(document.getElementById("controller"), controller);
+    this.startProcessing(document.getElementById("controller"), initController);
 };
 
 View.prototype.setStart = function() {
     document.body.innerHTML = gameTemplate();
-    this.startProcessing(document.getElementById("game"), game);
+    this.startProcessing(document.getElementById("game"), initGame);
 };
 
 View.prototype.setHelp = function() {
     document.body.innerHTML = helpTemplate();
 };
+
+View.prototype.setPlayAgain = function(leaderBoard) {
+    console.log("HERE");
+    console.log(leaderBoard);
+    document.body.innerHTML = playAgainTemplate({"leaderBoard": leaderBoard});
+}
 
 module.exports = View;
