@@ -13,22 +13,25 @@ var main = function() {
 
     var commProtocol = {
         sendControlled: function() {
-            console.log("controlled in protocol");
             controlled = true;
             view.setControlled(roomId);
         },
         sendControllerStart: function() {
-            console.log("starting controller by protocol");
             view.setStart();
         },
         sendPlayAgain: function(leaderBoard) {
             if (controlled) {
+                view.setPlayAgainControlled(leaderBoard);
             } else {
                 view.setPlayAgain(leaderBoard);
             }
         },
+        sendControllerPlayAgain: function() {
+            view.setControllerPlayAgain();
+        },
         sendEnterName: function(name) {
             comm.emitSubmitScore(roomId, name);
+            view.setControllerPlayAgain();
         }
     };
     var comm = new Comm(commProtocol);
@@ -43,10 +46,13 @@ var main = function() {
 
     var gameProtocol = {
         sendGameOver: function(score) {
+            console.log("THERES A GAME OVER");
             processingInstance.exit();
             if (controlled) {
+                console.log("controlled so emitting game over");
                 comm.emitGameOver(roomId, score);
             } else {
+                console.log("not controlled so asking for name or using saved name");
                 if (name === null || name === "") {
                     name = prompt("enter name to submit score");
                 }
@@ -93,10 +99,15 @@ var main = function() {
         view.setStart();
     });
 
+    $(document).on("click", "#controller-play-again", function() {
+        view.setControllerStart();
+        comm.emitControllerStart(roomId);
+    });
+
 };
 
 main();
-},{"./utilities/comm":21,"./utilities/idGenerator":22,"./utilities/view":23,"jquery-browserify":10}],2:[function(require,module,exports){
+},{"./utilities/comm":23,"./utilities/idGenerator":24,"./utilities/view":25,"jquery-browserify":10}],2:[function(require,module,exports){
 "use strict";
 /*globals Handlebars: true */
 var base = require("./handlebars/base");
@@ -10035,24 +10046,31 @@ module.exports = Handlebars.template({"compiler":[5,">= 2.0.0"],"main":function(
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template({"compiler":[5,">= 2.0.0"],"main":function(depth0,helpers,partials,data) {
-  return "<canvas id=\"game\" tabindex=\"1\"></canvas>";
+  return "<div id=\"title\">game of shapes</div>\n<div class=\"btn\" id=\"controller-play-again\">play again</div>\n<div><a href=\"http://masonbedard.com\">more projects</a></div>\n";
   },"useData":true});
 
 },{"hbsfy/runtime":9}],15:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template({"compiler":[5,">= 2.0.0"],"main":function(depth0,helpers,partials,data) {
-  return "<div class=\"menu-item\" id=\"title\">game of shapes</div>\n<div class=\"menu-item\">\n    <p>how to connect a controller</p>\n    <p>Choose play on the device that you want to use as the game display.</p>\n    <p>Next navigate to this web page on a second device that is touch enabled and choose control.</p>\n    <p>Then enter the id given on your game display into the controller.</p>\n    <p>If successful, your controller is now connected and you can use it to start!<p>\n    <p>how to play</p>\n    <p>If you are playing with a controller, hold your touch device with both hands.</p>\n    <p>Use your thumbs to manipulate the analog sticks, which appear wherever you initiate contact with the screen.</p>\n    <p>The left stick is for movement, while the right stick is for firing.</p>\n    <p>The keys w,a,s and d can be used for movement if you are not using a controller.</p>\n    <p>The mouse is used for firing without a controller. Simply click in the direction that you want you want the projectiles to go.</p>\n    <p>In game of shapes you play as the largest blue circle.</p>\n    <p>The other circles that you encounter are helpful. But all other shapes are harmful.</p>\n    <p>Stop them before they can take you out!</p>\n</div>\n<div class=\"menu-item btn\" id=\"back\">back</div>";
+  return "<canvas id=\"game\" tabindex=\"1\"></canvas>";
   },"useData":true});
 
 },{"hbsfy/runtime":9}],16:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template({"compiler":[5,">= 2.0.0"],"main":function(depth0,helpers,partials,data) {
-  return "<div class=\"menu-item title\">a game of shapes</div>\n<div class=\"menu-item btn\" id=\"play\">play</div>\n<div class=\"menu-item btn\" id=\"control\">control</div>\n<div class=\"menu-item btn\" id=\"help\">help</div>";
+  return "<div class=\"menu-item\" id=\"title\">game of shapes</div>\n<div class=\"menu-item\">\n    <p>how to connect a controller</p>\n    <p>Choose play on the device that you want to use as the game display.</p>\n    <p>Next navigate to this web page on a second device that is touch enabled and choose control.</p>\n    <p>Then enter the id given on your game display into the controller.</p>\n    <p>If successful, your controller is now connected and you can use it to start!<p>\n    <p>how to play</p>\n    <p>If you are playing with a controller, hold your touch device with both hands.</p>\n    <p>Use your thumbs to manipulate the analog sticks, which appear wherever you initiate contact with the screen.</p>\n    <p>The left stick is for movement, while the right stick is for firing.</p>\n    <p>The keys w,a,s and d can be used for movement if you are not using a controller.</p>\n    <p>The mouse is used for firing without a controller. Simply click in the direction that you want you want the projectiles to go.</p>\n    <p>In game of shapes you play as the largest blue circle.</p>\n    <p>The other circles that you encounter are helpful. But all other shapes are harmful.</p>\n    <p>Stop them before they can take you out!</p>\n</div>\n<div class=\"menu-item btn\" id=\"back\">back</div>";
   },"useData":true});
 
 },{"hbsfy/runtime":9}],17:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template({"compiler":[5,">= 2.0.0"],"main":function(depth0,helpers,partials,data) {
+  return "<div class=\"menu-item title\">a game of shapes</div>\n<div class=\"menu-item btn\" id=\"play\">play</div>\n<div class=\"menu-item btn\" id=\"control\">control</div>\n<div class=\"menu-item btn\" id=\"help\">help</div>";
+  },"useData":true});
+
+},{"hbsfy/runtime":9}],18:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template({"compiler":[5,">= 2.0.0"],"main":function(depth0,helpers,partials,data) {
@@ -10062,24 +10080,41 @@ module.exports = Handlebars.template({"compiler":[5,">= 2.0.0"],"main":function(
     + " to control</div>";
 },"useData":true});
 
-},{"hbsfy/runtime":9}],18:[function(require,module,exports){
+},{"hbsfy/runtime":9}],19:[function(require,module,exports){
 // hbsfy compiled Handlebars template
 var Handlebars = require('hbsfy/runtime');
 module.exports = Handlebars.template({"1":function(depth0,helpers,partials,data) {
   var helper, functionType="function", escapeExpression=this.escapeExpression;
-  return "\n    <p>"
+  return "\n            <li>"
     + escapeExpression(((helper = helpers.name || (depth0 && depth0.name)),(typeof helper === functionType ? helper.call(depth0, {"name":"name","hash":{},"data":data}) : helper)))
     + " "
     + escapeExpression(((helper = helpers.score || (depth0 && depth0.score)),(typeof helper === functionType ? helper.call(depth0, {"name":"score","hash":{},"data":data}) : helper)))
-    + "</p>\n    ";
+    + "</li>\n        ";
 },"compiler":[5,">= 2.0.0"],"main":function(depth0,helpers,partials,data) {
-  var stack1, buffer = "<div id=\"title\">game of shapes</div>\n<div class=\"btn\" id=\"play-again\">play again</div>\n<div>\n    <p>leader board</p>\n    ";
+  var stack1, buffer = "<div id=\"title\">game of shapes</div>\n<div class=\"btn\" id=\"play-again\">play again</div>\n<div>\n    <p>leader board</p>\n    <ol>\n        ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.leaderBoard), {"name":"each","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  return buffer + "\n</div>\n<div><a href=\"://masonbedard.com\">more projects</a></div>\n\n";
+  return buffer + "\n    </ol>\n</div>\n<div><a href=\"http://masonbedard.com\">more projects</a></div>\n\n";
 },"useData":true});
 
-},{"hbsfy/runtime":9}],19:[function(require,module,exports){
+},{"hbsfy/runtime":9}],20:[function(require,module,exports){
+// hbsfy compiled Handlebars template
+var Handlebars = require('hbsfy/runtime');
+module.exports = Handlebars.template({"1":function(depth0,helpers,partials,data) {
+  var helper, functionType="function", escapeExpression=this.escapeExpression;
+  return "\n            <li>"
+    + escapeExpression(((helper = helpers.name || (depth0 && depth0.name)),(typeof helper === functionType ? helper.call(depth0, {"name":"name","hash":{},"data":data}) : helper)))
+    + " "
+    + escapeExpression(((helper = helpers.score || (depth0 && depth0.score)),(typeof helper === functionType ? helper.call(depth0, {"name":"score","hash":{},"data":data}) : helper)))
+    + "</li>\n        ";
+},"compiler":[5,">= 2.0.0"],"main":function(depth0,helpers,partials,data) {
+  var stack1, buffer = "<div id=\"title\">game of shapes</div>\n<div>\n    <p>leader board</p>\n    <ol>\n        ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.leaderBoard), {"name":"each","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  return buffer + "\n    </ol>\n</div>\n<div><a href=\"http://masonbedard.com\">more projects</a></div>\n\n";
+},"useData":true});
+
+},{"hbsfy/runtime":9}],21:[function(require,module,exports){
 var initController = function(pjs) {
 
   var halfScreenWidth;
@@ -10249,7 +10284,7 @@ var initController = function(pjs) {
 };
 
 module.exports = initController;
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 // red 221, 105, 97       dd6961
 // green     161, 200, 154     a1c89a
 
@@ -13737,7 +13772,7 @@ var initGame = function(pjs) {
 
 module.exports = initGame;
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var Comm = function(protocol) {
 
     this.socket = io.connect(window.location.href);
@@ -13751,12 +13786,17 @@ var Comm = function(protocol) {
     });
 
     this.socket.on("set play again", function(data) {
+        console.log("told to play again");
         protocol.sendPlayAgain(data.leaderBoard);
     });
 
     this.socket.on("enter name", function(data) {
         var name = prompt("enter name to submit score");
         protocol.sendEnterName(name);
+    });
+
+    this.socket.on("set controller play again", function() {
+        protocol.sendControllerPlayAgain();
     });
 
 };
@@ -13791,7 +13831,7 @@ Comm.prototype.emitSubmitScore = function(roomId, name, score) {
 };
 
 module.exports = Comm;
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 module.exports = {
     getId: function() {
         var text = "";
@@ -13801,7 +13841,7 @@ module.exports = {
         return text;
     }
 };
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var indexTemplate = require("../../hbs/index.hbs");
 var playTemplate = require("../../hbs/play.hbs");
 var controlTemplate = require("../../hbs/control.hbs");
@@ -13810,6 +13850,8 @@ var gameTemplate = require("../../hbs/game.hbs");
 var controllerTemplate = require("../../hbs/controller.hbs");
 var helpTemplate = require("../../hbs/help.hbs");
 var playAgainTemplate = require("../../hbs/playAgain.hbs");
+var playAgainControlledTemplate = require("../../hbs/playAgainControlled.hbs");
+var controllerPlayAgainTemplate = require("../../hbs/controllerPlayAgain.hbs");
 var initGame = require("../game/game");
 var initController = require("../game/controller");
 
@@ -13854,10 +13896,16 @@ View.prototype.setHelp = function() {
 };
 
 View.prototype.setPlayAgain = function(leaderBoard) {
-    console.log("HERE");
-    console.log(leaderBoard);
     document.body.innerHTML = playAgainTemplate({"leaderBoard": leaderBoard});
-}
+};
+
+View.prototype.setPlayAgainControlled = function(leaderBoard) {
+    document.body.innerHTML = playAgainControlledTemplate({"leaderBoard": leaderBoard});
+};
+
+View.prototype.setControllerPlayAgain = function() {
+    document.body.innerHTML = controllerPlayAgainTemplate();
+};
 
 module.exports = View;
-},{"../../hbs/control.hbs":11,"../../hbs/controlled.hbs":12,"../../hbs/controller.hbs":13,"../../hbs/game.hbs":14,"../../hbs/help.hbs":15,"../../hbs/index.hbs":16,"../../hbs/play.hbs":17,"../../hbs/playAgain.hbs":18,"../game/controller":19,"../game/game":20}]},{},[1]);
+},{"../../hbs/control.hbs":11,"../../hbs/controlled.hbs":12,"../../hbs/controller.hbs":13,"../../hbs/controllerPlayAgain.hbs":14,"../../hbs/game.hbs":15,"../../hbs/help.hbs":16,"../../hbs/index.hbs":17,"../../hbs/play.hbs":18,"../../hbs/playAgain.hbs":19,"../../hbs/playAgainControlled.hbs":20,"../game/controller":21,"../game/game":22}]},{},[1]);

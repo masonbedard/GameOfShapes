@@ -11,12 +11,17 @@ var Comm = function(protocol) {
     });
 
     this.socket.on("set play again", function(data) {
+        console.log("told to play again");
         protocol.sendPlayAgain(data.leaderBoard);
     });
 
     this.socket.on("enter name", function(data) {
         var name = prompt("enter name to submit score");
         protocol.sendEnterName(name);
+    });
+
+    this.socket.on("set controller play again", function() {
+        protocol.sendControllerPlayAgain();
     });
 
 };

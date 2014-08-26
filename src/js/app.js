@@ -12,22 +12,25 @@ var main = function() {
 
     var commProtocol = {
         sendControlled: function() {
-            console.log("controlled in protocol");
             controlled = true;
             view.setControlled(roomId);
         },
         sendControllerStart: function() {
-            console.log("starting controller by protocol");
             view.setStart();
         },
         sendPlayAgain: function(leaderBoard) {
             if (controlled) {
+                view.setPlayAgainControlled(leaderBoard);
             } else {
                 view.setPlayAgain(leaderBoard);
             }
         },
+        sendControllerPlayAgain: function() {
+            view.setControllerPlayAgain();
+        },
         sendEnterName: function(name) {
             comm.emitSubmitScore(roomId, name);
+            view.setControllerPlayAgain();
         }
     };
     var comm = new Comm(commProtocol);
@@ -42,10 +45,13 @@ var main = function() {
 
     var gameProtocol = {
         sendGameOver: function(score) {
+            console.log("THERES A GAME OVER");
             processingInstance.exit();
             if (controlled) {
+                console.log("controlled so emitting game over");
                 comm.emitGameOver(roomId, score);
             } else {
+                console.log("not controlled so asking for name or using saved name");
                 if (name === null || name === "") {
                     name = prompt("enter name to submit score");
                 }
@@ -90,6 +96,11 @@ var main = function() {
 
     $(document).on("click", "#play-again", function() {
         view.setStart();
+    });
+
+    $(document).on("click", "#controller-play-again", function() {
+        view.setControllerStart();
+        comm.emitControllerStart(roomId);
     });
 
 };

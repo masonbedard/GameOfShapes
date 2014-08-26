@@ -84,8 +84,8 @@ var connect = function(socket) {
             room.contSocket.emit("enter name");
         } else {
             // save score and get leaders get high scores
-            room.roomSocket.emit("display high scores", {"leaderBoard": [{"name": "mason", "score": 5000}, {"name": "allie", "score": "100"}]});
-            room.contSocket.emit("controller set play again");
+            room.roomSocket.emit("set play again", {"leaderBoard": [{"name": "mason", "score": 5000}, {"name": "allie", "score": "100"}]});
+            room.contSocket.emit("set controller play again");
         }
     });
 

@@ -6,6 +6,8 @@ var gameTemplate = require("../../hbs/game.hbs");
 var controllerTemplate = require("../../hbs/controller.hbs");
 var helpTemplate = require("../../hbs/help.hbs");
 var playAgainTemplate = require("../../hbs/playAgain.hbs");
+var playAgainControlledTemplate = require("../../hbs/playAgainControlled.hbs");
+var controllerPlayAgainTemplate = require("../../hbs/controllerPlayAgain.hbs");
 var initGame = require("../game/game");
 var initController = require("../game/controller");
 
@@ -50,9 +52,15 @@ View.prototype.setHelp = function() {
 };
 
 View.prototype.setPlayAgain = function(leaderBoard) {
-    console.log("HERE");
-    console.log(leaderBoard);
     document.body.innerHTML = playAgainTemplate({"leaderBoard": leaderBoard});
-}
+};
+
+View.prototype.setPlayAgainControlled = function(leaderBoard) {
+    document.body.innerHTML = playAgainControlledTemplate({"leaderBoard": leaderBoard});
+};
+
+View.prototype.setControllerPlayAgain = function() {
+    document.body.innerHTML = controllerPlayAgainTemplate();
+};
 
 module.exports = View;
