@@ -9,6 +9,7 @@ var main = function() {
     var controlled = false;
     var processingInstance = null;
     var name = null;
+    var $document = $(document);
 
     var commProtocol = {
         sendControlled: function() {
@@ -60,13 +61,13 @@ var main = function() {
         }
     };
 
-    $(document).on("click", "#play", function() {
+    $document.on("click", "#play", function() {
         roomId = IdGenerator.getId();
         comm.emitNewRoom(roomId);
         view.setPlay(roomId);
     });
 
-    $(document).on("click", "#control", function() {
+    $document.on("click", "#control", function() {
         roomId = prompt('enter room id');
         comm.emitControllerConnect(roomId, function(data) {
             if (data.success) {
@@ -77,28 +78,28 @@ var main = function() {
         });
     });
 
-    $(document).on("click", "#start", function() {
+    $document.on("click", "#start", function() {
         view.setStart();
     });
 
-    $(document).on("click", "#controller-start", function() {
+    $document.on("click", "#controller-start", function() {
         view.setControllerStart();
         comm.emitControllerStart(roomId);
     });
 
-    $(document).on("click", "#help", function() {
+    $document.on("click", "#help", function() {
         view.setHelp();
     });
 
-    $(document).on("click", "#back", function() {
+    $document.on("click", "#back", function() {
         view.setIndex();
     });
 
-    $(document).on("click", "#play-again", function() {
+    $document.on("click", "#play-again", function() {
         view.setStart();
     });
 
-    $(document).on("click", "#controller-play-again", function() {
+    $document.on("click", "#controller-play-again", function() {
         view.setControllerStart();
         comm.emitControllerStart(roomId);
     });
